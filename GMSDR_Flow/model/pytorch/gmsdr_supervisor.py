@@ -43,7 +43,6 @@ class GMSDRSupervisor:
         gmsdr_model = GMSDRModel(adj_mx, self._logger, **self._model_kwargs)
         self.gmsdr_model = gmsdr_model.cuda() if torch.cuda.is_available() else gmsdr_model
         self._logger.info("Model created")
-
         self._epoch_num = self._train_kwargs.get('epoch', 0)
         if self._epoch_num > 0:
             self.load_model()

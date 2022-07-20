@@ -1,10 +1,11 @@
 import numpy as np
 import torch
-from torch import nn,Tensor
+from torch import nn, Tensor
 import torch.nn.functional as F
 from lib import utils
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 
 class Seq2SeqAttrs:
     def __init__(self, adj_mx, **model_kwargs):
@@ -20,6 +21,7 @@ class Seq2SeqAttrs:
         self.pre_v = int(model_kwargs.get('pre_v', 1))
         self.input_dim = int(model_kwargs.get('input_dim', 2))
         self.output_dim = int(model_kwargs.get('output_dim', 1))
+
 
 class LayerParams:
     def __init__(self, rnn_network: torch.nn.Module, layer_type: str):
@@ -47,8 +49,9 @@ class LayerParams:
 
         return self._biases_dict[length]
 
+
 class GMSDRCell(torch.nn.Module):
-    def __init__(self, num_units,input_dim, adj_mx, max_diffusion_step, num_nodes, pre_k, pre_v, nonlinearity='tanh',
+    def __init__(self, num_units, input_dim, adj_mx, max_diffusion_step, num_nodes, pre_k, pre_v, nonlinearity='tanh',
                  filter_type="laplacian", use_gc_for_ru=True):
         """
 
@@ -90,13 +93,9 @@ class GMSDRCell(torch.nn.Module):
 
         self._fc_params = LayerParams(self, 'fc')
         self._gconv_params = LayerParams(self, 'gconv')
-         # w ∈ (d*d) ht=Wx+satt(Hk+R(Hk))，k表示前k个隐藏状态
         self.W = nn.Parameter(torch.zeros(self._num_units, self._num_units), requires_grad=True)
         self.b = nn.Parameter(torch.zeros(num_nodes, self._num_units), requires_grad=True)
         self.R = nn.Parameter(torch.zeros(pre_k, num_nodes, self._num_units), requires_grad=True)
-        #self.R = nn.Parameter(torch.zeros(pre_k, num_nodes, self._num_units, self._num_units), requires_grad=True)
-        #self.rlinear = nn.Linear(self._num_units, 1)
-        #self.R = nn.Parameter(torch.zeros(pre_k, self._num_units), requires_grad=True)
         self.attlinear = nn.Linear(num_nodes * self._num_units, 1)
 
     @staticmethod
@@ -165,7 +164,8 @@ class GMSDRCell(torch.nn.Module):
             x2 = self.adp.mm(x1) - x0
             x = self._concat(x, x2)
             x1, x0 = x2, x1
-        num_matrices = (len(self._supports)+1) * self._max_diffusion_step + 1
+        num_matrices = (len(self._supports) + 1) * self._max_diffusion_step + 1
+        # num_matrices = (len(self._supports)) * self._max_diffusion_step + 1
         x = torch.reshape(x, shape=[num_matrices, self._num_nodes, input_size, batch_size])
         x = x.permute(3, 1, 2, 0)  # (batch_size, num_nodes, input_size, order)
         x = torch.reshape(x, shape=[batch_size * self._num_nodes, input_size * num_matrices])

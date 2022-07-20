@@ -65,7 +65,7 @@ class DecoderModel(nn.Module, Seq2SeqAttrs):
         nn.Module.__init__(self)
         Seq2SeqAttrs.__init__(self, adj_mx, **model_kwargs)
         self.output_dim = int(model_kwargs.get('output_dim', 1))
-        self.horizon = int(model_kwargs.get('horizon', 1))  # for the decoder
+        self.horizon = int(model_kwargs.get('horizon', 12))  # for the decoder
         self.projection_layer = nn.Linear(self.rnn_units, self.output_dim)
         self.gmsdr_layers = nn.ModuleList(
             [GMSDRCell(self.rnn_units, self.rnn_units, adj_mx, self.max_diffusion_step, self.num_nodes, self.pre_k, self.pre_v,
@@ -133,14 +133,12 @@ class GMSDRModel(nn.Module, Seq2SeqAttrs):
         :param batches_seen: global step [optional, not exist for inference]
         :return: output: (self.horizon, batch_size, self.num_nodes * self.output_dim)
         """
-        go_symbol = inputs
         decoder_hx_k = hx_k
-        decoder_input = go_symbol
+        decoder_input = inputs
 
         outputs = []
-        start = inputs.shape[0] - self.decoder_model.horizon
         for t in range(self.decoder_model.horizon):
-            decoder_output, decoder_hx_k = self.decoder_model(decoder_input[start + t],
+            decoder_output, decoder_hx_k = self.decoder_model(decoder_input[t],
                                                               decoder_hx_k)
             outputs.append(decoder_output)
         outputs = torch.stack(outputs)

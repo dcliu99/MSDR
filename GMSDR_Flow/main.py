@@ -16,6 +16,8 @@ TF_ENABLE_ONEDNN_OPTS = 0
 parser = argparse.ArgumentParser()
 parser.add_argument('--config_filename', default='data/model/PEMS08.yaml', type=str,
                     help='Configuration filename for restoring the model.')
+parser.add_argument('--id_filename', default=None, type=str,
+                    help='Id filename for dataset')
 args = parser.parse_args()
 
 
@@ -31,7 +33,7 @@ def main(args):
         adj = get_adjacency_matrix(distance_df_filename=config['data']['sensors_distance'],
                                    num_of_vertices=config['model']['num_nodes'],
                                    type_=config['model']['construct_type'],
-                                   id_filename=None) #
+                                   id_filename=args.id_filename)
         adj_mx = torch.FloatTensor(adj)
         dataloader = load_dataset(dataset_dir=config['data']['data'],
                                   normalizer=config['data']['normalizer'],
