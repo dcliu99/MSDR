@@ -177,9 +177,9 @@ def generate_train_val_test(args, mean_filename):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--output_dir', type=str, default="../data/processed/PEMS03/", help="output folder")
-    parser.add_argument('--flow_mean', type=str, default="../data/PEMS03/PEMS03_flow_count.pkl", help="mean flow file")
-    parser.add_argument('--traffic_df_filename', type=str, default="../data/PEMS03/PEMS03.npz", help="dataset")
+    parser.add_argument('--output_dir', type=str, default="../data/processed/PEMS08/", help="output folder")
+    parser.add_argument('--flow_mean', type=str, default="../data/PEMS08/PEMS08_flow_count.pkl", help="mean flow file")
+    parser.add_argument('--traffic_df_filename', type=str, default="../data/PEMS08/PEMS08.npz", help="dataset")
     parser.add_argument('--seq_length_x', type=int, default=12, help='input sequence len')
     parser.add_argument('--seq_length_y', type=int, default=12, help='output sequence len')
     parser.add_argument('--y_start', type=int, default=1, help='start step')
